@@ -271,27 +271,24 @@ function contact(c) {
 </div></main>`);
 }
 
+// Privacy + Terms: the exact texts in privacy.md and terms.md (Bert's words; edit those files, not this code). The
+// renderer knows only what they use: "# Title", the "Last updated:" line, "## N. Heading" sections and plain paragraphs;
+// every text is escaped, and the contact address becomes a mailto link.
 function legal(page, c) {
-  const isP = page === 'privacy';
-  const rows = isP ? [
-    ['This website', 'This website collects nothing about you: it has no forms, no accounts, no cookies, no tracking and no analytics, and it loads nothing from other companies.'],
-    ['When you email us', `If you write to ${esc(c.email)}, we use your name, email address and message only to answer you. We don’t sell it or share it for marketing.`],
-    ['Our host', `The site is hosted on ${esc(c.host)}. Like any web host, it handles basic technical details of each visit (such as your IP address) to deliver the pages and keep them safe.`],
-    ['Our products', 'PIQSYNC, FLOW and QUEUE have their own privacy terms. This page covers this website only.'],
-    ['Changes', 'If this page changes, the date at the top changes too.'],
-    ['Contact', `Write to ${esc(c.email)}.`],
-  ] : [
-    ['Who we are', `This website belongs to ${esc(c.company)} (“QAVENTIQ”, “we”), ${esc(c.city)}.`],
-    ['Information only', 'The pages describe QAVENTIQ and its products. They are provided “as is”. Using this website doesn’t create a contract.'],
-    ['Our products', 'Using PIQSYNC, FLOW or QUEUE is covered by their own agreements.'],
-    ['Names and logos', 'QAVENTIQ, PIQSYNC, FLOW, QUEUE and their logos belong to us. Please don’t use them in a way that suggests we endorse you.'],
-    ['Law', 'Texas law applies to these terms.'],
-    ['Contact', `Write to ${esc(c.email)}.`],
-  ];
-  const title = isP ? 'Privacy' : 'Terms of use';
+  const lines = readFileSync(join(HERE, `${page}.md`), 'utf8').split(/\r?\n/);
+  let title = page === 'privacy' ? 'Privacy Policy' : 'Terms of Use', body = '';
+  const text = (t) => esc(t).replaceAll(esc(c.email), mail(c));
+  for (const raw of lines) {
+    const l = raw.trim();
+    if (!l) continue;
+    if (l.startsWith('# ')) title = l.slice(2).trim();
+    else if (l.startsWith('## ')) body += `<h2>${esc(l.slice(3).trim())}</h2>\n`;
+    else if (/^Last updated:/i.test(l)) body += `<p class="meta">${esc(l)}</p>\n`;
+    else body += `<p>${text(l)}</p>\n`;
+  }
   return shell(page, c, { title: `${title} · QAVENTIQ`, description: `${title} for qaventiq.com.` }, `<main id="main" class="doc-main"><div class="wrap narrow">
-<h1>${esc(title)}</h1><p class="meta">Last updated: ${esc(c.updated)}</p>
-<dl class="doc">${rows.map(([h, p]) => `<dt>${esc(h)}</dt><dd>${p}</dd>`).join('')}</dl></div></main>`);
+<h1>${esc(title)}</h1>
+${body}</div></main>`);
 }
 
 function notFound(c) {
