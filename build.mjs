@@ -31,7 +31,7 @@ export function config(raw, { preview = false } = {}) {
 // ---- the products (facts from the PIQSYNC repo: docs/ingest-bridge.md, the crew help, piqsync.com) ----------------------
 const PRODUCTS = {
   piqsync: {
-    name: 'PIQSYNC', icon: 'piqsync-icon.png', where: 'In the cloud', plate: 'plate--piqsync',
+    name: 'PIQSYNC', icon: 'piqsync-icon-tile.png', lockup: 'piqsync-lockup.png', lockupSize: [585, 175], lockupAlt: 'PIQSYNC, Picture Intelligence. Quality. Synchronized.', where: 'In the cloud', plate: 'plate--piqsync',
     line: 'The platform for school photography studios: galleries, orders, messages and schools.',
     eyebrow: 'PIQSYNC · Picture Intelligence. Quality. Synchronized.',
     h1: 'Everything after the shutter clicks.',
@@ -103,7 +103,8 @@ const mail = (c) => `<a class="mail" href="mailto:${esc(c.email)}">${esc(c.email
 const lockup = (cls, w, h, alt = 'QAVENTIQ') => `<picture class="${cls}"><source srcset="${asset('qaventiq-lockup-light.svg')}" media="(prefers-color-scheme: light)"><img src="${asset('qaventiq-lockup-dark.svg')}" alt="${esc(alt)}" width="${w}" height="${h}"></picture>`;
 // "PIQSYNC by QAVENTIQ": the PIQSYNC logo followed by "by QAVENTIQ" in text
 const piqBy = () => `<span class="piqby"><picture><source srcset="${asset('piqsync-logo-on-light.png')}" media="(prefers-color-scheme: light)"><img src="${asset('piqsync-logo-on-dark.png')}" alt="PIQSYNC" width="175" height="28"></picture><span>by QAVENTIQ</span></span>`;
-const icon = (key, size = 64) => `<img class="picon" src="${asset(PRODUCTS[key].icon)}" alt="${esc(PRODUCTS[key].name)} icon" width="${size}" height="${size}">`;
+// a product's icon tile at `size` wide; a tile that isn't square (PIQSYNC's Q, 188×175) keeps its own shape, never squashed
+const icon = (key, size = 64) => { const [w, h] = PRODUCTS[key].iconSize || [1, 1]; return `<img class="picon" src="${asset(PRODUCTS[key].icon)}" alt="${esc(PRODUCTS[key].name)} icon" width="${size}" height="${Math.round((size * h) / w)}">`; };
 
 function shell(page, c, { title, description, bodyClass = '' }, inner) {
   const nav = NAV.map(([p, label]) => `<a href="${href(p)}"${p === page ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('');
@@ -199,9 +200,8 @@ function home(c) {
 
 function product(key, c) {
   const p = PRODUCTS[key];
-  const logo = key === 'piqsync'
-    ? `<div class="plate ${p.plate} plate--logo"><img src="${asset('piqsync-logo-on-dark.png')}" alt="PIQSYNC" width="700" height="112"></div>`
-    : `<div class="plate ${p.plate}"><img src="${asset(p.lockup)}" alt="${esc(p.name)}, powered by PIQSYNC" width="${p.lockupSize[0]}" height="${p.lockupSize[1]}"></div>`;
+  // every product's header: its own lockup on the same plate (PIQSYNC's with its glow and slogan, like FLOW's and QUEUE's)
+  const logo = `<div class="plate ${p.plate}"><img src="${asset(p.lockup)}" alt="${esc(p.lockupAlt || `${p.name}, powered by PIQSYNC`)}" width="${p.lockupSize[0]}" height="${p.lockupSize[1]}"></div>`;
   const others = ORDER.filter((k) => k !== key).map((k) => PRODUCTS[k].name).join(' and ');
   return shell(key, c, { title: `${p.name} · QAVENTIQ`, description: p.lead, bodyClass: `is-product is-${key}` }, `<section class="phero"><div class="wrap phero-in">
 <p class="crumb"><a href="${href('index')}#products">Products</a> <span aria-hidden="true">/</span> ${esc(p.name)}</p>
