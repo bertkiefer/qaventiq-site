@@ -57,7 +57,7 @@ const PRODUCTS = {
     lead: 'QUEUE is the app the photo crew uses at the school. Each student’s card is scanned before the photo, so every picture is tied to the right child, even in a gym with no internet.',
     what: [
       'The crew scans the student’s card with a Bluetooth card scanner. QUEUE answers on the scanner itself with a short pattern of beeps and a light, so the person scanning hears from across the room whether the student is ready to photograph, already photographed, or not on this job.',
-      'The day’s names list lives on the tablet. At most schools the tablets have no internet, and QUEUE keeps working: each station counts its own students and the stations merge their totals later, or share them live over a phone hotspot. Only small check-in notes go over it; photos never do.',
+      'The day’s Student/Client List lives on the tablet. At most schools the tablets have no internet, and QUEUE keeps working: each station counts its own students and the stations merge their totals later, or share them live over a phone hotspot. Only small check-in notes go over it; photos never do.',
     ],
     features: [
       ['Card scanning', 'An Opticon card scanner connects over Bluetooth, straight to QUEUE: no keyboard pop-ups, no typing.'],
